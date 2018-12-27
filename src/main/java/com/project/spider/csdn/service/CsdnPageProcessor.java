@@ -1,23 +1,32 @@
-package com.project.spider;
+package com.project.spider.csdn;
 
+import com.project.spider.BasePageProcessor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
-import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.selector.Selectable;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
  * @author ftc
  * @date 2018-12-25
  */
-public class CSDNPageProcessor extends BasePageProcessor {
+@Service("csdnPageProcessor")
+public class CsdnPageProcessor extends BasePageProcessor {
+
+    @Resource
+    private CsdnRepository csdnRepository;
 
     private final static String regex = "^https://blog\\.csdn\\.net+.*(article/details)/[0-9]*$";
     private static volatile int count = 0;
 
     @Override
     public void process(Page page) {
+        System.out.println("csdbRepository:" + csdnRepository);
         List<String> links = page.getHtml().links().all();
         links.forEach(link -> {
             if (link.matches(regex)) {
