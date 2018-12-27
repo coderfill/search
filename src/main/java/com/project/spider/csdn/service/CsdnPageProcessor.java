@@ -26,7 +26,6 @@ public class CsdnPageProcessor extends BasePageProcessor {
 
     @Override
     public void process(Page page) {
-        System.out.println("csdbRepository:" + csdnRepository);
         List<String> links = page.getHtml().links().all();
         links.forEach(link -> {
             if (link.matches(regex)) {
