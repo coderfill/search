@@ -1,8 +1,8 @@
-package com.project.spider.csdn;
+package com.project.spider.csdn.service;
 
 import com.project.spider.BasePageProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.project.spider.csdn.dao.CsdnRepository;
+import com.project.spider.csdn.info.CsdnCrawlerEntity;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
@@ -48,6 +48,15 @@ public class CsdnPageProcessor extends BasePageProcessor {
                 tag += oneTag + ",";
             }
             System.out.println("title:" + title + ", createTime:" + createTime + ", author:" + author + ", tag:" + tag + ", total:" + count);
+
+            CsdnCrawlerEntity entity = new CsdnCrawlerEntity();
+            entity.setAuthor(author);
+            entity.setCreateTime(createTime);
+            entity.setTag(tag);
+            entity.setTitle(title);
+            entity.setUrl(page.getUrl().get());
+
+            csdnRepository.persistAndFlush(entity);
         }
     }
 
@@ -56,9 +65,4 @@ public class CsdnPageProcessor extends BasePageProcessor {
         return site;
     }
 
-
-    public static void main(String[] args) {
-        String url = "https://blog.csdn.net/qq544649790/article/details/83032497";
-        System.out.println(url.matches(regex));
-    }
 }
