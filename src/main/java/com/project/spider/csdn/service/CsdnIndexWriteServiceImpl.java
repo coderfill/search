@@ -1,21 +1,17 @@
 package com.project.spider.csdn.service;
 
+import com.project.search.info.IndexDocStroage;
 import com.project.search.service.IndexWriteService;
 import com.project.search.service.SearchServerService;
-import com.project.spider.SolrInputDocStroage;
 import com.project.spider.csdn.dao.CsdnRepository;
 import com.project.spider.csdn.info.CsdnCrawlerEntity;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
+import com.project.spider.csdn.info.CsdnCrawlerInfo;
 import org.apache.solr.common.SolrInputDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -25,7 +21,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @date 2018-12-27
  */
 @Service("csdnIndexWriteServiceImpl")
-public class CsdnIndexWriteServiceImpl implements IndexWriteService {
+public class CsdnIndexWriteServiceImpl implements IndexWriteService<CsdnCrawlerInfo> {
 
     private LinkedBlockingQueue<SolrInputDocument> solrInputDocuments = new LinkedBlockingQueue<SolrInputDocument>();
 
@@ -39,23 +35,39 @@ public class CsdnIndexWriteServiceImpl implements IndexWriteService {
     private CsdnRepository csdnRepository;
 
     @Autowired
-    private SolrInputDocStroage solrInputDocStroage() {
-        return new SolrInputDocStroage(solrInputDocuments, searchServer, threshold);
+    private IndexDocStroage indexDocStroage() {
+        return new IndexDocStroage(solrInputDocuments, searchServer, threshold);
     }
 
 
     @Override
-    public void addIndex() {
-        List<CsdnCrawlerEntity> list = csdnRepository.findAll();
-        list.forEach(entity -> {
-            SolrInputDocument solrInputDocument = new SolrInputDocument();
-            solrInputDocument.setField("id", entity.getId());
-            solrInputDocument.setField("title", entity.getTitle());
-            solrInputDocument.setField("url", entity.getUrl());
-            solrInputDocument.setField("author", entity.getAuthor());
-            solrInputDocument.setField("create_time", entity.getCreateTime());
-            solrInputDocument.setField("tag", entity.getTag());
-            solrInputDocStroage().push(solrInputDocument);
-        });
+    public void addIndex(CsdnCrawlerInfo csdnCrawlerInfo) {
+        SolrInputDocument solrInputDocument = new SolrInputDocument();
+        solrInputDocument.setField("id", UUID.randomUUID().toString());
+        solrInputDocument.setField("title", csdnCrawlerInfo.getTitle());
+        solrInputDocument.setField("url", csdnCrawlerInfo.getUrl());
+        solrInputDocument.setField("author", csdnCrawlerInfo.getAuthor());
+        solrInputDocument.setField("create_time", csdnCrawlerInfo.getCreateTime());
+        solrInputDocument.setField("tag", csdnCrawlerInfo.getTag());
+        indexDocStroage().push(solrInputDocument);
+
+        CsdnCrawlerEntity entity = toEntity(csdnCrawlerInfo);
+        csdnRepository.persistAndFlush(entity);
+    }
+
+    /**
+     * 将页面的爬虫信息转化为对应的entity
+     * @param info
+     * @return
+     */
+    private CsdnCrawlerEntity toEntity(CsdnCrawlerInfo info) {
+        CsdnCrawlerEntity entity = new CsdnCrawlerEntity();
+        entity.setAuthor(info.getAuthor());
+        entity.setCreateTime(info.getCreateTime());
+        entity.setTag(info.getTag());
+        entity.setTitle(info.getTitle());
+        entity.setUrl(info.getUrl());
+        entity.setIsIndex(0);
+        return entity;
     }
 }

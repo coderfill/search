@@ -1,8 +1,14 @@
 package com.project.spider.csdn.service;
 
+import com.project.search.service.IndexWriteService;
 import com.project.spider.BasePageProcessor;
 import com.project.spider.csdn.dao.CsdnRepository;
 import com.project.spider.csdn.info.CsdnCrawlerEntity;
+import com.project.spider.csdn.info.CsdnCrawlerInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
@@ -12,14 +18,18 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
+ * csdn爬虫页面处理类
  * @author ftc
  * @date 2018-12-25
  */
 @Service("csdnPageProcessor")
 public class CsdnPageProcessor extends BasePageProcessor {
 
-    @Resource
-    private CsdnRepository csdnRepository;
+    private final static Logger logger = LoggerFactory.getLogger(CsdnPageProcessor.class);
+
+    @Autowired
+    @Qualifier("csdnIndexWriteServiceImpl")
+    private IndexWriteService csdnIndexWriteService;
 
     private final static String regex = "^https://blog\\.csdn\\.net+.*(article/details)/[0-9]*$";
     private static volatile int count = 0;
@@ -46,16 +56,14 @@ public class CsdnPageProcessor extends BasePageProcessor {
             for (String oneTag : tags) {
                 tag += oneTag + ",";
             }
-            System.out.println("title:" + title + ", createTime:" + createTime + ", author:" + author + ", tag:" + tag + ", total:" + count);
-
-            CsdnCrawlerEntity entity = new CsdnCrawlerEntity();
-            entity.setAuthor(author);
-            entity.setCreateTime(createTime);
-            entity.setTag(tag);
-            entity.setTitle(title);
-            entity.setUrl(page.getUrl().get());
-
-            csdnRepository.persistAndFlush(entity);
+            logger.debug("title:" + title + ", createTime:" + createTime + ", author:" + author + ", tag:" + tag + ", total:" + count);
+            CsdnCrawlerInfo info = new CsdnCrawlerInfo();
+            info.setAuthor(author);
+            info.setCreateTime(createTime);
+            info.setTag(tag);
+            info.setUrl(page.getUrl().get());
+            info.setTitle(title);
+            csdnIndexWriteService.addIndex(info);
         }
     }
 

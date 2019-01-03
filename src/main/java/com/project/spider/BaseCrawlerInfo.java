@@ -1,18 +1,10 @@
-package com.project.spider.csdn.info;
-
-import com.project.spider.BaseCrawlerInfo;
+package com.project.spider;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-/**
- * csdn爬取基本信息
- * @author ftc
- * @date 2018-12-26
- */
-public class CsdnCrawlerInfo extends BaseCrawlerInfo implements Serializable{
+public class BaseCrawlerInfo implements Serializable {
 
-    private static final long serialVersionUID = 4105628676929552530L;
 
     /**
      * 主键Id
@@ -93,5 +85,4 @@ public class CsdnCrawlerInfo extends BaseCrawlerInfo implements Serializable{
     public void setTag(String tag) {
         this.tag = tag;
     }
-
 }
