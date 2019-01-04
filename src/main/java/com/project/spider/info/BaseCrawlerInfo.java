@@ -1,4 +1,4 @@
-package com.project.spider;
+package com.project.spider.info;
 
 import java.io.Serializable;
 import java.util.UUID;

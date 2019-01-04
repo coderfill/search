@@ -1,4 +1,4 @@
-package com.project.search.info;
+package com.project.search.info.stroage;
 
 import com.project.search.service.SearchServerService;
 import org.apache.solr.client.solrj.SolrClient;
@@ -13,9 +13,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * 索引文件仓库类
  */
-public class IndexDocStroage {
+public class IndexDocStroageInfo {
 
-    private final static Logger logger = LoggerFactory.getLogger(IndexDocStroage.class);
+    private final static Logger logger = LoggerFactory.getLogger(IndexDocStroageInfo.class);
 
     /**
      * 待索引数据队列，使用volatie关键字，保证数据的可见性
@@ -32,7 +32,7 @@ public class IndexDocStroage {
 
     private SolrClient client = null;
 
-    public IndexDocStroage(LinkedBlockingQueue<SolrInputDocument> documents, SearchServerService searchServer, int threshold) {
+    public IndexDocStroageInfo(LinkedBlockingQueue<SolrInputDocument> documents, SearchServerService searchServer, int threshold) {
         this.documents = documents;
         this.searchServer = searchServer;
         this.threshold = threshold;

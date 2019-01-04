@@ -1,9 +1,7 @@
 package com.project.spider.csdn.service;
 
 import com.project.search.service.IndexWriteService;
-import com.project.spider.BasePageProcessor;
-import com.project.spider.csdn.dao.CsdnRepository;
-import com.project.spider.csdn.info.CsdnCrawlerEntity;
+import com.project.spider.service.BasePageProcessor;
 import com.project.spider.csdn.info.CsdnCrawlerInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +12,6 @@ import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.selector.Selectable;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**

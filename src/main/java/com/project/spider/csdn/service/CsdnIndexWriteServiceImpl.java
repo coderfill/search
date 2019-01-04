@@ -1,6 +1,6 @@
 package com.project.spider.csdn.service;
 
-import com.project.search.info.IndexDocStroage;
+import com.project.search.info.stroage.IndexDocStroageInfo;
 import com.project.search.service.IndexWriteService;
 import com.project.search.service.SearchServerService;
 import com.project.spider.csdn.dao.CsdnRepository;
@@ -35,8 +35,8 @@ public class CsdnIndexWriteServiceImpl implements IndexWriteService<CsdnCrawlerI
     private CsdnRepository csdnRepository;
 
     @Autowired
-    private IndexDocStroage indexDocStroage() {
-        return new IndexDocStroage(solrInputDocuments, searchServer, threshold);
+    private IndexDocStroageInfo indexDocStroage() {
+        return new IndexDocStroageInfo(solrInputDocuments, searchServer, threshold);
     }
 
 

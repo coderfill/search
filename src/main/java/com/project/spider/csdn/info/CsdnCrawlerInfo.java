@@ -1,6 +1,6 @@
 package com.project.spider.csdn.info;
 
-import com.project.spider.BaseCrawlerInfo;
+import com.project.spider.info.BaseCrawlerInfo;
 
 import java.io.Serializable;
 import java.util.UUID;

@@ -1,6 +1,6 @@
 package com.project.search.service;
 
-import com.project.spider.BaseCrawlerInfo;
+import com.project.spider.info.BaseCrawlerInfo;
 
 /**
  * 索引文件的写操作接口，主要针对更新、删除和添加索引
