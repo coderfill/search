@@ -51,9 +51,9 @@ public class CsdnPageProcessor extends BasePageProcessor {
             List<String> tags = selectable.xpath("//span[@class='tags-box artic-tag-box']//a[@class='tag-link']/text()").all();
             String tag = "";
             for (String oneTag : tags) {
-                tag += oneTag + ",";
+                tag = tag + "," + oneTag ;
             }
-            logger.debug("title:" + title + ", createTime:" + createTime + ", author:" + author + ", tag:" + tag + ", total:" + count);
+            logger.debug("title:" + title + "--createTime:" + createTime + "--author:" + author + "--tag:" + tag + "--total:" + count);
             CsdnCrawlerInfo info = new CsdnCrawlerInfo();
             info.setAuthor(author);
             info.setCreateTime(createTime);

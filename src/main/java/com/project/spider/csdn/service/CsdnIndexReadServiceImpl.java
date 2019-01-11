@@ -7,10 +7,10 @@ import com.project.search.service.SearchServerService;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.params.MapSolrParams;
-import org.apache.solr.common.util.NamedList;
+import org.apache.solr.common.params.FacetParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * csdn索引读操作实现类
@@ -76,7 +73,7 @@ public class CsdnIndexReadServiceImpl implements IndexReadService<CsdnSearchResu
     public CsdnSearchResultInfo searchByKeyword(String keyword) throws IOException, SolrServerException {
         SolrClient client = searchServer.getDefaultClient();
         SolrQuery query = new SolrQuery();
-        query.set("q", "title:" + keyword);
+        query.set("q", keyword);
         //确定数据回显的field域
         query.addField("id");
         query.addField("title");
@@ -84,15 +81,24 @@ public class CsdnIndexReadServiceImpl implements IndexReadService<CsdnSearchResu
         query.addField("tag");
         query.addField("url");
         query.addField("create_time");
+
         //设置高亮
         query.setHighlight(true);
         query.addHighlightField("title");
         query.setHighlightSimplePre("<font color='red'>");
         query.setHighlightSimplePost("</font>");
         //设置高亮部分每段显示的长度(以字符为单位)
-        query.setHighlightFragsize(10);
+        query.setHighlightFragsize(30);
         //高亮部分分为几段显示
         query.setHighlightSnippets(3);
+
+        //设置分组查询
+        query.addFacetQuery(keyword);
+//        query.addFacetPivotField("tag", "title");
+        query.addFacetField("tag");
+        query.setFacetSort(FacetParams.FACET_SORT_COUNT);
+        query.setFacetMinCount(1);
+
         query.setRows(row);
         QueryResponse response = client.query(query);
         SolrDocumentList list = response.getResults();
@@ -101,17 +107,30 @@ public class CsdnIndexReadServiceImpl implements IndexReadService<CsdnSearchResu
         list.forEach(doc -> {
             CsdnSearchDocInfo info = new CsdnSearchDocInfo();
             info.setAuthor(doc.getFieldValue("author") == null ? null : doc.getFieldValue("author").toString());
-            info.setTitle(doc.getFieldValue("title") == null ? null : doc.getFieldValue("title").toString());
+//            info.setTitle(doc.getFieldValue("title") == null ? null : doc.getFieldValue("title").toString());
+            Map<String, List<String>> highlighterMap = highlighter.get(doc.getFieldValue("id"));
+            if (highlighterMap.size() == 0 || highlighterMap.isEmpty()) {
+                info.setTitle(doc.getFieldValue("title") == null ? null : doc.getFieldValue("title").toString());
+            } else {
+                info.setTitle(highlighter.get(doc.getFieldValue("id")).get("title").get(0));
+            }
             info.setTag(doc.getFieldValue("tag") == null ? null : doc.getFieldValue("tag").toString());
             info.setUrl(doc.getFieldValue("url") == null ? null : doc.getFieldValue("url").toString());
             info.setCreateTime(doc.getFieldValue("create_time") == null ? null : doc.getFieldValue("create_time").toString());
             csdnSearchDocInfos.add(info);
-//            logger.debug(info.getAuthor() + "," + info.getTitle() + "," + info.getUrl() + "," + info.getTag());
-            logger.debug("highlighter:" + highlighter.get(doc.getFieldValue("id")).get("title").get(0));
+        });
+        Map<String, Object> facetMap = new LinkedHashMap<String, Object>();
+        response.getFacetFields().forEach(facetField -> {
+            List<FacetField.Count> counts = facetField.getValues();
+            counts.forEach(count -> {
+                facetMap.put(count.getName(), count.getCount());
+                System.out.println("_name:" + count.getName() + ", _count:" + count.getCount());
+            });
         });
         CsdnSearchResultInfo info = new CsdnSearchResultInfo();
         info.setNum(list.getNumFound());
         info.setSearchDocList(csdnSearchDocInfos);
+        info.setFacetMap(facetMap);
         return info;
     }
 }

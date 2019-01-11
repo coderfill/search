@@ -1,9 +1,8 @@
 package com.project.spider.csdn.web;
 
+import com.alibaba.fastjson.JSONObject;
 import com.project.search.info.csdn.CsdnSearchResultInfo;
 import com.project.search.service.IndexReadService;
-import com.project.search.service.IndexWriteService;
-import com.project.search.service.SearchServerService;
 import com.project.spider.csdn.service.CsdnPageProcessor;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +40,13 @@ public class CsdnController {
 
 
     @RequestMapping("/search.do")
-    public void search(@RequestParam("keyword") String keyword) {
+    public Object search(@RequestParam("keyword") String keyword) {
         try {
             CsdnSearchResultInfo info = (CsdnSearchResultInfo) indexReadService.searchByKeyword(keyword);
+            return JSONObject.toJSON(info);
         } catch (IOException | SolrServerException e) {
             e.printStackTrace();
+            return null;
         }
     }
 }

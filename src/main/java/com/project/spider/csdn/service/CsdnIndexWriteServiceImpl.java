@@ -6,6 +6,7 @@ import com.project.search.service.SearchServerService;
 import com.project.spider.csdn.dao.CsdnRepository;
 import com.project.spider.csdn.info.CsdnCrawlerEntity;
 import com.project.spider.csdn.info.CsdnCrawlerInfo;
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,9 +49,13 @@ public class CsdnIndexWriteServiceImpl implements IndexWriteService<CsdnCrawlerI
         solrInputDocument.setField("url", csdnCrawlerInfo.getUrl());
         solrInputDocument.setField("author", csdnCrawlerInfo.getAuthor());
         solrInputDocument.setField("create_time", csdnCrawlerInfo.getCreateTime());
-        solrInputDocument.setField("tag", csdnCrawlerInfo.getTag());
+        String tag = csdnCrawlerInfo.getTag();
+        if (StringUtils.isNotBlank(tag)) {
+            solrInputDocument.setField("tag", tag.substring(1).split(","));
+        } else {
+            solrInputDocument.setField("tag","");
+        }
         indexDocStroage().push(solrInputDocument);
-
         CsdnCrawlerEntity entity = toEntity(csdnCrawlerInfo);
         csdnRepository.persistAndFlush(entity);
     }

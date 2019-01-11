@@ -2,6 +2,7 @@ package com.project.search.info.base;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 搜索结果基础类
@@ -11,8 +12,7 @@ import java.util.List;
  */
 public class BaseSearchResultInfo<T extends BaseSearchDocInfo> implements Serializable {
 
-    private static final long serialVersionUID = -3266998255673931702L;
-
+    private static final long serialVersionUID = 4479214320643817503L;
     /**
      * 搜索结果总数
      */
@@ -22,6 +22,8 @@ public class BaseSearchResultInfo<T extends BaseSearchDocInfo> implements Serial
      * 单次搜索结果集合
      */
     protected List<T> searchDocList;
+
+    protected Map<String, Object> facetMap;
 
 
     public long getNum() {
@@ -38,5 +40,13 @@ public class BaseSearchResultInfo<T extends BaseSearchDocInfo> implements Serial
 
     public void setSearchDocList(List<T> searchDocList) {
         this.searchDocList = searchDocList;
+    }
+
+    public Map<String, Object> getFacetMap() {
+        return facetMap;
+    }
+
+    public void setFacetMap(Map<String, Object> facetMap) {
+        this.facetMap = facetMap;
     }
 }
