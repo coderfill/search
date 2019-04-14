@@ -1,15 +1,14 @@
 package com.project.solr.index.service.impl;
 
-import com.project.solr.index.info.IndexDocStroageInfo;
+import com.project.base.logger.LoggerBaseSupport;
+import com.project.solr.index.info.ManualIndexFileInfo;
+import com.project.scheduler.ManualScheduler;
+import com.project.solr.index.info.storage.ManualIndexStorageInfo;
 import com.project.solr.index.service.IndexService;
-import com.project.crawler.manual.info.ManualIndexFileInfo;
-import com.project.solr.server.service.SolrServerService;
 import org.apache.solr.common.SolrInputDocument;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * 在线开发服务手册索引文件写服务的实现
@@ -17,21 +16,21 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author ftc
  * @date 2019-04-11
  */
-@Service("manualIndexWriteService")
-public class ManualIndexServiceImpl implements IndexService<ManualIndexFileInfo> {
+@Service("manualIndexService")
+public class ManualIndexServiceImpl extends LoggerBaseSupport implements IndexService<ManualIndexFileInfo>, InitializingBean {
 
-
-    private LinkedBlockingQueue<SolrInputDocument> solrInputDocuments = new LinkedBlockingQueue<SolrInputDocument>();
-
-    @Value("${solr.batch.addIndex.num.threshold}")
-    private int threshold;
 
     @Autowired
-    private SolrServerService serverService;
+    private ManualIndexStorageInfo indexStorageInfo;
 
     @Autowired
-    private IndexDocStroageInfo indexDocStroageInfo() {
-        return new IndexDocStroageInfo(solrInputDocuments, serverService, threshold);
+    private ManualScheduler manualScheduler() {
+        return new ManualScheduler(indexStorageInfo);
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+
     }
 
     @Override
@@ -45,6 +44,10 @@ public class ManualIndexServiceImpl implements IndexService<ManualIndexFileInfo>
         document.setField("keyword", indexFileInfo.getKeyword());
         document.setField("description", indexFileInfo.getDescription());
         document.setField("type", indexFileInfo.getType());
-        indexDocStroageInfo().push(document);
+
+        //添加至待索引队列中
+        indexStorageInfo.add(document);
+//        documents.offer(document);
     }
+
 }

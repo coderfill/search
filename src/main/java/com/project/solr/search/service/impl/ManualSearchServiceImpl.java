@@ -1,5 +1,6 @@
 package com.project.solr.search.service.impl;
 
+import com.project.base.logger.LoggerBaseSupport;
 import com.project.solr.search.info.base.ResultInfo;
 import com.project.solr.search.info.manual.ManualSearchDocResultInfo;
 import com.project.solr.search.service.SearchService;
@@ -14,6 +15,7 @@ import org.apache.solr.common.params.FacetParams;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -28,15 +30,27 @@ import java.util.Map;
  * @date 2019-04-12
  */
 @Service("manualSearchService")
-public class ManualSearchServiceImpl implements SearchService<ManualSearchDocResultInfo>, InitializingBean {
+public class ManualSearchServiceImpl extends LoggerBaseSupport implements SearchService<ManualSearchDocResultInfo>, InitializingBean {
 
+    private final String highlightSimplePre = "<font color='red'>";
 
+    private final String highlightSimplePost = "</font>";
+
+    /**
+     * 设置高亮部分每段显示的长度(以字符为单位)
+     */
+    private final int highlightFragsize = 30;
+
+    /**
+     * 高亮部分分为几段显示
+     */
+    private final int highlightSnippets = 3;
     @Autowired
     private SolrServerService serverService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-
+        Assert.notNull(serverService, "SolrServerService is required.....");
     }
 
     /**
@@ -78,17 +92,8 @@ public class ManualSearchServiceImpl implements SearchService<ManualSearchDocRes
         query.addField("tag");
         query.addField("url");
         query.addField("create_time");
-
-        //设置高亮
-        query.setHighlight(true);
-        query.addHighlightField("title");
-        query.setHighlightSimplePre("<font color='red'>");
-        query.setHighlightSimplePost("</font>");
-        //设置高亮部分每段显示的长度(以字符为单位)
-        query.setHighlightFragsize(30);
-        //高亮部分分为几段显示
-        query.setHighlightSnippets(3);
-
+        query.addField("type");
+        setHighlighter(query, new String[]{"title"});
         //设置分组查询
         query.addFacetQuery(keyword);
 //        query.addFacetPivotField("tag", "title");
@@ -104,7 +109,6 @@ public class ManualSearchServiceImpl implements SearchService<ManualSearchDocRes
         list.forEach(doc -> {
             ManualSearchDocResultInfo info = new ManualSearchDocResultInfo();
             info.setAuthor(doc.getFieldValue("author") == null ? null : doc.getFieldValue("author").toString());
-//            info.setTitle(doc.getFieldValue("title") == null ? null : doc.getFieldValue("title").toString());
             Map<String, List<String>> highlighterMap = highlighter.get(doc.getFieldValue("id"));
             if (highlighterMap.size() == 0 || highlighterMap.isEmpty()) {
                 info.setTitle(doc.getFieldValue("title") == null ? null : doc.getFieldValue("title").toString());
@@ -114,14 +118,16 @@ public class ManualSearchServiceImpl implements SearchService<ManualSearchDocRes
             info.setKeyword(doc.getFieldValue("keyword") == null ? null : doc.getFieldValue("keyword").toString());
             info.setUrl(doc.getFieldValue("url") == null ? null : doc.getFieldValue("url").toString());
             info.setCreateTime(doc.getFieldValue("create_time") == null ? null : doc.getFieldValue("create_time").toString());
+            info.setType(doc.getFieldValue("type") == null ? null : doc.getFieldValue("type").toString());
             docs.add(info);
+            logger.debug(info.toString());
         });
         Map<String, Object> facetMap = new LinkedHashMap<String, Object>();
         response.getFacetFields().forEach(facetField -> {
             List<FacetField.Count> counts = facetField.getValues();
             counts.forEach(count -> {
                 facetMap.put(count.getName(), count.getCount());
-                System.out.println("_name:" + count.getName() + ", _count:" + count.getCount());
+                logger.debug("_name:" + count.getName() + ", _count:" + count.getCount());
             });
         });
         ResultInfo info = new ResultInfo();
@@ -131,5 +137,27 @@ public class ManualSearchServiceImpl implements SearchService<ManualSearchDocRes
         return info;
     }
 
+    @Override
+    public ResultInfo seniorSearchByParams(Map<String, String> params) throws IOException, SolrServerException {
+        return null;
+    }
+
+
+    /**
+     * 设置查询结果高亮
+     * @param query 待查询的{@link SolrQuery}语句
+     * @param highlighterFields 需要进行高亮的field
+     */
+    protected void setHighlighter(SolrQuery query, String[] highlighterFields) {
+        //设置高亮
+        query.setHighlight(true);
+        for (String field : highlighterFields) {
+            query.addHighlightField(field);
+        }
+        query.setHighlightSimplePre(highlightSimplePre);
+        query.setHighlightSimplePost(highlightSimplePost);
+        query.setHighlightFragsize(highlightFragsize);
+        query.setHighlightSnippets(highlightSnippets);
+    }
 
 }

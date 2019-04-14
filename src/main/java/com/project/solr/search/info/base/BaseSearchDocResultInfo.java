@@ -42,6 +42,11 @@ public class BaseSearchDocResultInfo {
      */
     private String description;
 
+    /**
+     * 所属类别
+     */
+    private String type;
+
 
     public String getId() {
         return id;
@@ -99,6 +104,14 @@ public class BaseSearchDocResultInfo {
         this.description = description;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         return "BaseSearchDocResultInfo{" +
@@ -108,6 +121,7 @@ public class BaseSearchDocResultInfo {
                 ", createTime='" + createTime + '\'' +
                 ", author='" + author + '\'' +
                 ", keyword='" + keyword + '\'' +
+                ", type='" + type + '\'' +
                 ", description='" + description + '\'' +
                 '}';
     }
