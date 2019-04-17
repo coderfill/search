@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,target-densitydpi=device-dpi">
+        <title>在线开发手册</title>
+        <meta name="keywords" content="GRC,开发,手册,API">
+        <meta name="Description" content="在线开发手册">
+        <link rel="shortcut icon" th:href="@{'/img/favicon.png'}">
+        <link th:href="@{'/css/index/app.css'}" rel="stylesheet">
+        <script th:src="@{'/plugin/jquery/jquery.js'}"></script>
+        <script th:src="@{'/js/search.js'}"></script>
+    </head>
+    <body style="background: rgb(255, 255, 255);">
+        <div id="app">
+            <div>
+                <section class="el-container coding is-vertical">
+                    <header class="el-header" style="height: 60px;">
+                        <img th:src="@{'/img/logo.png'}" class="logo">
+                    </header>
+                    <main class="el-main">
+                        <div class="el-row">
+                            <div class="el-col el-col-24">
+                                <div class="search_input el-input el-input-group el-input-group--append">
+                                    <input id="search_input" type="text" autocomplete="off" placeholder="Search一下，问题解决" class="el-input__inner">
+                                    <div class="el-input-group__append">
+                                        <button id="searchBtn" type="button" class="el-button el-button--default">
+                                            <span>Search一下</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                    <footer class="el-footer" style="height: 60px;"></footer>
+                </section>
+            </div>
+        </div>
+    </body>
+    <form id="search" action="./grcManual/search.do" method="get">
+        <input type="text" id="keyword" name="keyword" value="" hidden>
+    </form>
+</html>

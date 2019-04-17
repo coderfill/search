@@ -1,4 +1,4 @@
-package com.project.scheduler;
+package com.project.manual.scheduler;
 
 import com.project.base.logger.LoggerBaseSupport;
 import com.project.solr.index.info.storage.ManualIndexStorageInfo;
@@ -52,7 +52,7 @@ public class ManualScheduler extends LoggerBaseSupport implements InitializingBe
     /**
      * 自动创建索引的定时任务
      */
-    @Scheduled(cron = "0/5 * * * * ?")
+    @Scheduled(cron = "0/30 * * * * ?")
     public void index() {
         logger.debug("扫描【在线开发手册】待索引队列.....");
         SolrClient client = searchServerService.getUpdateClient();

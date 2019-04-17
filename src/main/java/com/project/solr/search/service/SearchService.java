@@ -1,6 +1,5 @@
 package com.project.solr.search.service;
 
-import com.project.search.info.base.BaseSearchResultInfo;
 import com.project.solr.search.info.base.BaseSearchDocResultInfo;
 import com.project.solr.search.info.base.ResultInfo;
 import org.apache.solr.client.solrj.SolrServerException;

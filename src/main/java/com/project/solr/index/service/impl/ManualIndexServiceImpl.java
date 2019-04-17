@@ -2,7 +2,7 @@ package com.project.solr.index.service.impl;
 
 import com.project.base.logger.LoggerBaseSupport;
 import com.project.solr.index.info.ManualIndexFileInfo;
-import com.project.scheduler.ManualScheduler;
+import com.project.manual.scheduler.ManualScheduler;
 import com.project.solr.index.info.storage.ManualIndexStorageInfo;
 import com.project.solr.index.service.IndexService;
 import org.apache.solr.common.SolrInputDocument;

@@ -1,6 +1,6 @@
 package com.project;
 
-import com.project.data.jpa.GenericRepositoryFactoryBean;
+import com.project.base.data.jpa.GenericRepositoryFactoryBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;

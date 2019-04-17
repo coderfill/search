@@ -89,10 +89,11 @@ public class ManualSearchServiceImpl extends LoggerBaseSupport implements Search
         query.addField("id");
         query.addField("title");
         query.addField("author");
-        query.addField("tag");
         query.addField("url");
         query.addField("create_time");
         query.addField("type");
+        query.addField("keyword");
+        query.addField("description");
         setHighlighter(query, new String[]{"title"});
         //设置分组查询
         query.addFacetQuery(keyword);
@@ -119,6 +120,7 @@ public class ManualSearchServiceImpl extends LoggerBaseSupport implements Search
             info.setUrl(doc.getFieldValue("url") == null ? null : doc.getFieldValue("url").toString());
             info.setCreateTime(doc.getFieldValue("create_time") == null ? null : doc.getFieldValue("create_time").toString());
             info.setType(doc.getFieldValue("type") == null ? null : doc.getFieldValue("type").toString());
+            info.setDescription(doc.getFieldValue("description") == null ? null : doc.getFieldValue("description").toString());
             docs.add(info);
             logger.debug(info.toString());
         });

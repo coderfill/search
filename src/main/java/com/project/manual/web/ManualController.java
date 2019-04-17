@@ -5,8 +5,11 @@ import com.project.manual.service.ManualService;
 import com.project.solr.search.info.base.ResultInfo;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,7 +19,7 @@ import java.io.IOException;
  * @author ftc
  * @date 2019-04-01
  */
-@RestController
+@Controller
 @RequestMapping(value = "/grcManual")
 public class ManualController extends LoggerBaseSupport {
 
@@ -41,9 +44,11 @@ public class ManualController extends LoggerBaseSupport {
 
 
     @RequestMapping(value = "/search.do")
-    public ResultInfo search(String keyword) {
+    public String search(String keyword, Model model) {
         try {
-            return manualService.searchByKeyword(keyword);
+            ResultInfo resultInfo = manualService.searchByKeyword(keyword);
+            model.addAttribute("resultInfo",resultInfo);
+            return "resultList";
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SolrServerException e) {
